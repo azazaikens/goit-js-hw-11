@@ -1,6 +1,7 @@
 import { PixabayAPI } from "./js/api";
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import throttle from "lodash.throttle";
+import Notiflix from "notiflix";
 
 const refs = {
     searchForm: document.querySelector('.search-form'),
@@ -75,6 +76,11 @@ refs.loadMore.addEventListener('click', async ev => {
     try {
         const data = await pixabayApi.galleryCard();
 
+        if (data.data.totalHits / 40 <= pixabayApi.page) {
+            refs.loadMore.classList.add('hidden')
+            Notify.failure('its all');
+            return
+        }
         let blockGallery = '';
         data.data.hits.map(el => {
         blockGallery += `<div class="photo-card">
@@ -97,7 +103,7 @@ refs.loadMore.addEventListener('click', async ev => {
       });
         refs.gallery.insertAdjacentHTML('beforeend', blockGallery);
         
-        if (pixabayApi.page === data.data.totalHits) {
+        if (pixabayApi.page === data.totalHits) {
             refs.loadMoreBtnEl.classList.add('hidden');
             Notify.failure(
               `We're sorry, but you've reached the end of search results`
@@ -105,6 +111,10 @@ refs.loadMore.addEventListener('click', async ev => {
         }
     } catch (err) {
         Notify.failure(`error: ${err.name}`);
+        console.log(err.name)
+        if (data.name) {
+            
+        };
     }
 })
 
