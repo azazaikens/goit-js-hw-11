@@ -6,6 +6,7 @@ const refs = {
     searchInput: document.querySelector('.search-input'),
     bthForm: document.querySelector('.bth-form'),
     gallery: document.querySelector('.gallery'),
+    loadMore: document.querySelector('.load-more')
 }
 
 const pixabayApi = new PixabayAPI();
@@ -48,29 +49,33 @@ refs.searchForm.addEventListener('submit', ev => {
           alert('некоректне слово');
 
           ev.target.reset();
+
           refs.gallery.innerHTML = '';
+
+          refs.loadMore.classList.add('hidden');
 
           return;
         }
 
         if (data.data.totalHits === 1) {
           refs.gallery.innerHTML = blockGallery;
+          refs.loadMore.classList.add('hidden');
         }
 
         refs.gallery.innerHTML = blockGallery;
+        refs.loadMore.classList.remove('hidden');
       })
       .catch(err => alert(`error: ${err.name}`));
 });
 
-window.addEventListener('scroll', throttle (async () => {
-  if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+refs.loadMore.addEventListener('click', async ev => {
     pixabayApi.page += 1;
 
     try {
-      const data = await pixabayApi.galleryCard();
+        const data = await pixabayApi.galleryCard();
 
-      let blockGallery = '';
-      data.data.hits.map(el => {
+        let blockGallery = '';
+        data.data.hits.map(el => {
         blockGallery += `<div class="photo-card">
                     <img class='photos' src="${el.webformatURL}" alt="${el.tags}" loading="lazy" />
                     <div class="info">
@@ -89,12 +94,49 @@ window.addEventListener('scroll', throttle (async () => {
                     </div>
                     </div>`;
       });
-      refs.gallery.insertAdjacentHTML('beforeend', blockGallery);
+        refs.gallery.insertAdjacentHTML('beforeend', blockGallery);
+        
+        if (pixabayApi.page === data.data.totalHits) {
+          refs.loadMoreBtnEl.classList.add('hidden');
+        }
     } catch (err) {
         alert(`error: ${err.name}`);
     }
-}
-console.log(1)
-}, 250)
-);
+})
+
+// window.addEventListener('scroll', throttle (async () => {
+//   if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+//     pixabayApi.page += 1;
+
+//     try {
+//       const data = await pixabayApi.galleryCard();
+
+//       let blockGallery = '';
+//       data.data.hits.map(el => {
+//         blockGallery += `<div class="photo-card">
+//                     <img class='photos' src="${el.webformatURL}" alt="${el.tags}" loading="lazy" />
+//                     <div class="info">
+//                         <p class="info-item">
+//                         <b>Likes</b> ${el.likes}
+//                         </p>
+//                         <p class="info-item">
+//                         <b>Views</b> ${el.views}
+//                         </p>
+//                         <p class="info-item">
+//                         <b>Comments</b> ${el.comments}
+//                         </p>
+//                         <p class="info-item">
+//                         <b>Downloads</b> ${el.downloads}
+//                         </p>
+//                     </div>
+//                     </div>`;
+//       });
+//       refs.gallery.insertAdjacentHTML('beforeend', blockGallery);
+//     } catch (err) {
+//         alert(`error: ${err.name}`);
+//     }
+//     console.log(1)
+//   }
+// }, 250)
+// );
 
