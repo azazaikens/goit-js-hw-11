@@ -1,4 +1,5 @@
 import { PixabayAPI } from "./js/api";
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import throttle from "lodash.throttle";
 
 const refs = {
@@ -17,7 +18,7 @@ refs.searchForm.addEventListener('submit', ev => {
     pixabayApi.q = ev.target.searchQuery.value.trim();
     pixabayApi.page = 1;
 
-    if (pixabayApi.q === '') alert('Введіть слово');
+    if (pixabayApi.q === '') Notify.failure(`Enter a word to search for`);
 
     pixabayApi
       .galleryCard()
@@ -46,7 +47,7 @@ refs.searchForm.addEventListener('submit', ev => {
           console.log(data)
           
         if (data.data.totalHits === 0) {
-          alert('некоректне слово');
+          Notify.failure(`Invalid search word`);
 
           ev.target.reset();
 
@@ -65,7 +66,7 @@ refs.searchForm.addEventListener('submit', ev => {
         refs.gallery.innerHTML = blockGallery;
         refs.loadMore.classList.remove('hidden');
       })
-      .catch(err => alert(`error: ${err.name}`));
+      .catch(err => Notify.failure(`error: ${err.name}`));
 });
 
 refs.loadMore.addEventListener('click', async ev => {
@@ -97,10 +98,13 @@ refs.loadMore.addEventListener('click', async ev => {
         refs.gallery.insertAdjacentHTML('beforeend', blockGallery);
         
         if (pixabayApi.page === data.data.totalHits) {
-          refs.loadMoreBtnEl.classList.add('hidden');
+            refs.loadMoreBtnEl.classList.add('hidden');
+            Notify.failure(
+              `We're sorry, but you've reached the end of search results`
+            );
         }
     } catch (err) {
-        alert(`error: ${err.name}`);
+        Notify.failure(`error: ${err.name}`);
     }
 })
 
