@@ -107,7 +107,7 @@ refs.loadMore.addEventListener('click', async ev => {
 // window.addEventListener('scroll', throttle (async () => {
 //   if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
 //     pixabayApi.page += 1;
-
+//
 //     try {
 //       const data = await pixabayApi.galleryCard();
 
