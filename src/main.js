@@ -76,7 +76,7 @@ refs.loadMore.addEventListener('click', async ev => {
     try {
         const data = await pixabayApi.galleryCard();
 
-        if (data.data.totalHits / 40 <= pixabayApi.page) {
+        if (Math.ceil(data.data.totalHits / 40) < pixabayApi.page) {
             refs.loadMore.classList.add('hidden')
             Notify.failure('its all');
             return
